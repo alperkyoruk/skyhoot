@@ -1,0 +1,13 @@
+package skylab.skyhoot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SkyhootApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SkyhootApplication.class, args);
+	}
+
+}

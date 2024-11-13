@@ -1,0 +1,120 @@
+package skylab.skyhoot.Business.concretes;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import skylab.skyhoot.Business.abstracts.GameService;
+import skylab.skyhoot.Business.abstracts.PlayerService;
+import skylab.skyhoot.Business.constants.Messages;
+import skylab.skyhoot.core.result.*;
+import skylab.skyhoot.dataAccess.PlayerDao;
+import skylab.skyhoot.entities.DTOs.Player.CreatePlayerDto;
+import skylab.skyhoot.entities.DTOs.Player.GetPlayerDto;
+import skylab.skyhoot.entities.DTOs.Player.GetPlayerIdGameIdDto;
+import skylab.skyhoot.entities.Player;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class PlayerManager implements PlayerService {
+
+    private PlayerDao playerDao;
+    private GameService gameService;
+
+    public PlayerManager(PlayerDao playerDao, @Lazy GameService gameService) {
+        this.playerDao = playerDao;
+        this.gameService = gameService;
+    }
+
+    @Override
+    public DataResult<GetPlayerIdGameIdDto> addPlayer(CreatePlayerDto createPlayerDto) {
+        var game = gameService.getGameEntityByGameCode(createPlayerDto.getGameCode()).getData();
+        if(game == null){
+            return new ErrorDataResult<>(Messages.gameNotFound);
+        }
+        Player player = Player.builder()
+                .game(game)
+                .ipAddress(createPlayerDto.getIpAddress())
+                .score(0)
+                .playerName(createPlayerDto.getPlayerName())
+                .playerId(UUID.randomUUID().toString())
+                .joinedAt(new Date())
+                .build();
+        playerDao.save(player);
+
+        var returnPlayer = new GetPlayerIdGameIdDto(player.getPlayerId(), game.getGameId());
+
+        return new SuccessDataResult<>(returnPlayer,Messages.playerAdded);
+    }
+
+    @Override
+    public Result deletePlayer(int playerId) {
+        var player = playerDao.findById(playerId);
+        if(player == null){
+            return new ErrorResult(Messages.playerNotFound);
+        }
+        playerDao.delete(player);
+        return new SuccessResult(Messages.playerDeleted);
+    }
+
+
+    @Override
+    public DataResult<GetPlayerDto> getPlayerById(int playerId) {
+        var player = playerDao.findById(playerId);
+        if(player == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+        var returnPlayer = new GetPlayerDto(player);
+        return new SuccessDataResult<>(returnPlayer, Messages.playerFound);
+    }
+
+    @Override
+    public DataResult<List<GetPlayerDto>> getPlayersByGameId(String gameId) {
+        var players = playerDao.findAllByGame_GameId(gameId);
+        if(players == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+        var returnPlayers = new GetPlayerDto().buildListGetPlayerDto(players);
+        return new SuccessDataResult<>(returnPlayers, Messages.playerFound);
+    }
+
+    @Override
+    public DataResult<List<GetPlayerDto>> getPlayersByIpAddress(String ipAddress) {
+        var players = playerDao.findAllByIpAddress(ipAddress);
+        if(players == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+        var returnPlayers = new GetPlayerDto().buildListGetPlayerDto(players);
+        return new SuccessDataResult<>(returnPlayers, Messages.playerFound);
+    }
+
+    @Override
+    public DataResult<Player> getPlayerEntityById(int id) {
+        var player = playerDao.findById(id);
+        if(player == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+        return new SuccessDataResult<>(player, Messages.playerFound);
+    }
+
+    @Override
+    public Result updatePlayerScore(String playerId, int score) {
+        var player = playerDao.findByPlayerId(playerId);
+        if(player == null){
+            return new ErrorResult(Messages.playerNotFound);
+        }
+        player.setScore(score);
+        playerDao.save(player);
+        return new SuccessResult(Messages.playerScoreUpdated);
+    }
+
+    @Override
+    public DataResult<Player> getPlayerEntityByPlayerId(String playerId) {
+        var player = playerDao.findByPlayerId(playerId);
+        if(player == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+        return new SuccessDataResult<>(player, Messages.playerFound);
+    }
+}
