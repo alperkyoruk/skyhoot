@@ -50,6 +50,8 @@ public interface GameService {
 
     Result updateGamePlayerCount(String gameId);
 
+    Result endGame(String gameId);
+
 
 
 }

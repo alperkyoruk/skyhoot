@@ -176,23 +176,15 @@ public class GameController {
         }
     }
 
-    @PostMapping("/getNextQuestion2")
-    public Result getNextQuestion2(@RequestParam String gameId) {
-        // Get the next question
-        var result = gameService.getNextQuestion(gameId);
-
-        GameMessage message = new GameMessage();
-        if (result.isSuccess()) {
-            message.setContent("Next question is: " + result.getData());
-        } else {
-            message.setContent("Failed to get next question: " + result.getMessage());
-        }
-        return result;
-    }
 
     @GetMapping("/getGameId")
     public DataResult<GetGameIdAndCodeDto> getGameId(@RequestParam String gameCode){
         return gameService.getGameId(gameCode);
+    }
+
+    @PostMapping("/endGame")
+    public Result endGame(@RequestParam String gameId) {
+        return gameService.endGame(gameId);
     }
 
 

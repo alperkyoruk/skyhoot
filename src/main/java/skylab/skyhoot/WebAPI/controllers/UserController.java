@@ -60,4 +60,14 @@ public class UserController {
     public Result removeModerator(@RequestParam int userId){
         return userService.removeModerator(userId);
     }
+
+    @PostMapping("/addVip")
+    public Result addVip(@RequestParam int userId){
+        return userService.addVip(userId);
+    }
+
+    @PostMapping("/removeVip")
+    public Result removeVip(@RequestParam int userId){
+        return userService.removeVip(userId);
+    }
 }

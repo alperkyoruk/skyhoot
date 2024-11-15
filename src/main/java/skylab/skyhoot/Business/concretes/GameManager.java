@@ -2,6 +2,7 @@ package skylab.skyhoot.Business.concretes;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import skylab.skyhoot.Business.abstracts.GameService;
@@ -11,18 +12,12 @@ import skylab.skyhoot.Business.abstracts.UserService;
 import skylab.skyhoot.Business.constants.Messages;
 import skylab.skyhoot.core.result.*;
 import skylab.skyhoot.dataAccess.GameDao;
+import skylab.skyhoot.entities.*;
 import skylab.skyhoot.entities.DTOs.Game.*;
 import skylab.skyhoot.entities.DTOs.Player.GetLeaderboardDto;
 import skylab.skyhoot.entities.DTOs.Player.GetPlayerDto;
-import skylab.skyhoot.entities.Game;
-import skylab.skyhoot.entities.Player;
-import skylab.skyhoot.entities.Question;
-import skylab.skyhoot.entities.Status;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -335,6 +330,36 @@ public class GameManager implements GameService {
         game.setCurrentPlayers(game.getCurrentPlayers() + 1);
         gameDao.save(game);
         return new SuccessResult(Messages.gamePlayerCountUpdated);
+    }
+
+    @Override
+    public Result endGame(String gameId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        if(currentPrincipalName == null) {
+            return new ErrorResult(Messages.userNotFound);
+        }
+
+        var user = userService.getUserEntityByUsername(currentPrincipalName).getData();
+        if(user == null) {
+            return new ErrorResult(Messages.userNotFound);
+        }
+
+        var game = gameDao.findByGameId(gameId);
+        if(game == null) {
+            return new ErrorResult(Messages.gameNotFound);
+        }
+
+    if(game.getHost().getUsername().equals(currentPrincipalName) ||
+        user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> Set.of("ROLE_ADMIN", "ROLE_MODERATOR").contains(role))) {
+        game.setStatus(Status.PASSIVE);
+        game.setGameCode("");
+        game.setEndedAt(new Date());
+    }
+        gameDao.save(game);
+        return new SuccessResult(Messages.gameEnded);
     }
 
 

@@ -13,6 +13,8 @@ import skylab.skyhoot.core.result.ErrorDataResult;
 import skylab.skyhoot.core.result.SuccessDataResult;
 import skylab.skyhoot.core.security.JwtService;
 import skylab.skyhoot.entities.DTOs.User.AuthRequest;
+import skylab.skyhoot.entities.Role;
+import skylab.skyhoot.entities.User;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,8 +35,22 @@ public class AuthController {
     public DataResult<String> generateToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
-            return new SuccessDataResult<String>(jwtService.generateToken(authRequest.getUsername()), "Token generated successfully");
+            // Cast to UserDetails to access the authorities (roles)
+            User user = (User) authentication.getPrincipal();
+
+            // Check if the user has any of the allowed roles
+            boolean hasAllowedRole = user.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN") ||
+                            role.getAuthority().equals("ROLE_MODERATOR") ||
+                            role.getAuthority().equals("ROLE_VIP"));
+
+            if (hasAllowedRole) {
+                return new SuccessDataResult<>(jwtService.generateToken(authRequest.getUsername()), "Token generated successfully");
+            }
+            return new ErrorDataResult<>("Access denied: Insufficient role permissions");
         }
+
         return new ErrorDataResult<>("Invalid username or password");
+
     }
 }

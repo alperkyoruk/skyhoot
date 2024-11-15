@@ -61,4 +61,8 @@ public class Messages {
     public static String isCorrectValueError = "Is correct value must be 0 or 1";
     public static String notAuthorized = "You are not the host of this game";
     public static String gamePlayerCountUpdated = "Game player count updated";
+    public static String gameEnded = "Game ended";
+    public static String VipAddedSuccessfully = "Vip added successfully";
+    public static String VipRemovedSuccessfully = "Vip removed successfully";
+    public static String userNotAuthorized = "User not authorized";
 }

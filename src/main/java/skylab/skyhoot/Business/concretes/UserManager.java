@@ -149,6 +149,29 @@ public class UserManager implements UserService {
     }
 
     @Override
+    public Result addVip(int userId) {
+        var user = userDao.findById(userId);
+        if(user == null){
+            return new ErrorResult(Messages.UserNotFound);
+        }
+
+        user.addRole(Role.ROLE_VIP);
+        userDao.save(user);
+        return new SuccessResult(Messages.VipAddedSuccessfully);
+    }
+
+    @Override
+    public Result removeVip(int userId) {
+        var user = userDao.findById(userId);
+        if(user == null){
+            return new ErrorResult(Messages.UserNotFound);
+        }
+
+        user.getAuthorities().remove(Role.ROLE_VIP);
+        return new SuccessResult(Messages.VipRemovedSuccessfully);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = getUserEntityByUsername(username).getData();
         return user;

@@ -1,6 +1,7 @@
 package skylab.skyhoot.WebAPI.controllers;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import skylab.skyhoot.Business.abstracts.QuestionService;
 import skylab.skyhoot.core.result.DataResult;
@@ -25,11 +26,13 @@ public class QuestionController {
     }
 
     @PostMapping("/addQuestion")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN  ', 'ROLE_MODERATOR', 'ROLE_VIP')")
     public DataResult<Integer> addQuestion(@RequestBody CreateQuestionDto createQuestionDto){
         return questionService.addQuestion(createQuestionDto);
     }
 
     @PostMapping("/deleteQuestion")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN  ', 'ROLE_MODERATOR', 'ROLE_VIP')")
     public Result deleteQuestion(@RequestParam int questionId){
         return questionService.deleteQuestion(questionId);
     }
@@ -57,20 +60,6 @@ public class QuestionController {
     @GetMapping("/getQuestionsByHost")
     public DataResult<List<GetQuestionForHostDto>> getQuestionsByHost(){
         return questionService.getQuestionsByHost();
-    }
-
-    @PostMapping("/broadcastQuestion")
-    public Result broadcastQuestion(@RequestParam int questionId) {
-        var questionDto = questionService.getQuestionById(questionId).getData();
-
-        if (questionDto == null) {
-            return new SuccessResult("Question not found.");
-        }
-
-        // Send the question to the /topic/question channel
-        messagingTemplate.convertAndSend("/topic/question", questionDto);
-
-        return new SuccessResult("Question broadcasted to players.");
     }
 
 

@@ -1,5 +1,6 @@
 package skylab.skyhoot.core.security;
 
+import org.springframework.http.HttpMethod;
 import skylab.skyhoot.Business.abstracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -37,11 +38,67 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(x ->
                         x
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
 
-                                .requestMatchers("/api/facilities/addFacility").hasAnyRole("ADMIN","MODERATOR")
+                             .requestMatchers("/api/auth/**").permitAll()
+
+                                .requestMatchers("/api/users/addUser").permitAll()
+                                .requestMatchers("/api/users/deleteUser").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/updateUser").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/getUserById").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/getUserByUsername").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/getUsers").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/addModerator").hasRole("ADMIN")
+                                .requestMatchers("/api/users/removeModerator").hasRole("ADMIN")
+                                .requestMatchers("/api/users/addVip").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/users/removeVip").hasAnyRole("ADMIN", "MODERATOR")
+
+                                .requestMatchers("/api/games/addGame").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/games/connectPlayer").permitAll()
+                                .requestMatchers("/api/games/deleteGame").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/games/endGame").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/games/getGameByGameCode").permitAll()
+
+                                .requestMatchers("/api/games/getGameEntityByGameCode").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/games/getGameId").permitAll()
+                                .requestMatchers("/api/games/getGameEntityByGameId").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/games/getGamesByHostId").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("api/games/getGameStarted").permitAll()
+                                .requestMatchers("/api/games/getLeaderboard").permitAll()
+                                //   .requestMatchers("/api/games/getNextQuestion").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/games/startGame").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/games/updateGame").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+
+                                .requestMatchers("/api/questions/addQuestion").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/questions/deleteQuestion").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/questions/getQuestionById").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/questions/updateQuestion").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/questions/getQuestionsByHost").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/questions/getQuestionEntityById").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/questions/getQuestionsByGameId").hasAnyRole("ADMIN", "MODERATOR")
+
+                                .requestMatchers("/api/answerOptions/addAnswerOption").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/answerOptions/deleteAnswerOption").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/answerOptions/getAnswerOptionById").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/answerOptions/updateAnswerOption").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/answerOptions/getAnswerOptionEntityById").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/answerOptions/getAnswerOptionsByQuestionId").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+
+                                .requestMatchers("/api/players/addPlayer").permitAll()
+                                .requestMatchers("/api/players/**").hasAnyRole("ADMIN", "MODERATOR")
+
+                                .requestMatchers("/api/playerAnswers/addPlayerAnswer").permitAll()
+                                .requestMatchers("/api/playerAnswers/getPlayerAnswerById").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/playerAnswers/deletePlayerAnswer").hasAnyRole("ADMIN", "MODERATOR")
+                                .requestMatchers("/api/playerAnswers/getPlayerAnswersByPlayerId").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/playerAnswers/getPlayerAnswersByQuestionId").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                                .requestMatchers("/api/playerAnswers/validatePlayerAnswer").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+
+
 
 
 

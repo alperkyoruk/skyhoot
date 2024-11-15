@@ -1,5 +1,7 @@
 package skylab.skyhoot.Business.concretes;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import skylab.skyhoot.Business.abstracts.AnswerOptionService;
 import skylab.skyhoot.Business.abstracts.QuestionService;
@@ -26,6 +28,7 @@ public class AnswerOptionManager implements AnswerOptionService {
 
     @Override
     public Result addAnswerOption(CreateAnswerOptionDto createAnswerOptionDto) {
+
 
         var question = questionService.getQuestionEntityById(createAnswerOptionDto.getQuestionId()).getData();
         if(question == null) {

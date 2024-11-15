@@ -1,5 +1,6 @@
 package skylab.skyhoot.WebAPI.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import skylab.skyhoot.Business.abstracts.AnswerOptionService;
 import skylab.skyhoot.core.result.DataResult;
@@ -20,6 +21,7 @@ public class AnswerOptionController {
     }
 
     @PostMapping("/addAnswerOption")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN  ', 'ROLE_MODERATOR', 'ROLE_USER')")
     public Result addAnswerOption(@RequestBody CreateAnswerOptionDto createAnswerOptionDto){
         return answerOptionService.addAnswerOption(createAnswerOptionDto);
     }

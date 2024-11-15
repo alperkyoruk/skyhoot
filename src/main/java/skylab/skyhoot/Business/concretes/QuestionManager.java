@@ -17,6 +17,7 @@ import skylab.skyhoot.entities.DTOs.Question.GetQuestionForHostDto;
 import skylab.skyhoot.entities.Question;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class QuestionManager implements QuestionService {
@@ -38,9 +39,17 @@ public class QuestionManager implements QuestionService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
+
         var user = userService.getUserEntityByUsername(currentPrincipalName).getData();
         if(user == null){
             return new ErrorDataResult<>(Messages.userNotFound);
+        }
+
+        if(user.getAuthorities().
+                stream()
+                .noneMatch(role -> Set.of("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_VIP").contains(role.getAuthority()))){
+            return new ErrorDataResult<>(Messages.userNotAuthorized);
+
         }
 
         Question question = Question.builder()

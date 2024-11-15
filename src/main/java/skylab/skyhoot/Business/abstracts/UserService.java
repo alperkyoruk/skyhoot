@@ -30,5 +30,9 @@ public interface UserService extends UserDetailsService {
 
     Result removeModerator(int userId);
 
+    Result addVip(int userId);
+
+    Result removeVip(int userId);
+
 
 }
