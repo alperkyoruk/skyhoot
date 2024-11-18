@@ -86,7 +86,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/answerOptions/getAnswerOptionById").hasAnyRole("ADMIN", "MODERATOR", "VIP")
                                 .requestMatchers("/api/answerOptions/updateAnswerOption").hasAnyRole("ADMIN", "MODERATOR", "VIP")
                                 .requestMatchers("/api/answerOptions/getAnswerOptionEntityById").hasAnyRole("ADMIN", "MODERATOR")
-                                .requestMatchers("/api/answerOptions/getAnswerOptionsByQuestionId").hasAnyRole("ADMIN", "MODERATOR", "VIP")
+                              //  .requestMatchers("/api/answerOptions/getAnswerOptionsByQuestionId").hasAnyRole("ADMIN", "MODERATOR")
 
                                 .requestMatchers("/api/players/addPlayer").permitAll()
                                 .requestMatchers("/api/players/**").hasAnyRole("ADMIN", "MODERATOR")

@@ -22,7 +22,9 @@ public interface AnswerOptionService {
 
     DataResult<AnswerOption> getAnswerOptionEntityById(int answerOptionId);
 
+    Result updatePlayerCount(int answerOptionId, int playerCount);
 
+    Result clearPlayerCounts(List<Integer> questionIds);
 
 
 

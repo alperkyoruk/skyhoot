@@ -29,4 +29,7 @@ public class AnswerOption {
     @JsonIgnore
     @JoinColumn(name = "question_id")
     private Question question;
+
+    @Column(name = "player_count")
+    private int playerCount;
 }

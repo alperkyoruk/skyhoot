@@ -16,12 +16,14 @@ public class GetAnswerOptionDto {
     private String option;
     private boolean isCorrect;
     private int questionId;
+    private int playerCount;
 
     public GetAnswerOptionDto(AnswerOption answerOption) {
         this.id = answerOption.getId();
         this.option = answerOption.getOption();
         this.questionId = answerOption.getQuestion().getId();
         this.isCorrect = answerOption.isCorrect();
+        this.playerCount = answerOption.getPlayerCount();
     }
 
 

@@ -65,4 +65,6 @@ public class Messages {
     public static String VipAddedSuccessfully = "Vip added successfully";
     public static String VipRemovedSuccessfully = "Vip removed successfully";
     public static String userNotAuthorized = "User not authorized";
+    public static String playerCountUpdated = "Player count updated";
+    public static String playerCountsCleared = "Player counts cleared";
 }

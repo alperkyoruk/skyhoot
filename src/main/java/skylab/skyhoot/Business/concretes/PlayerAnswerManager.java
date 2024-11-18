@@ -61,6 +61,7 @@ public class PlayerAnswerManager implements PlayerAnswerService {
                 .timeTaken(createPlayerAnswerDto.getTimeTaken())
                 .build();
 
+        answerOptionService.updatePlayerCount(answerOption.getId(), answerOption.getPlayerCount() + 1);
         playerAnswerDao.save(playerAnswer);
         validatePlayerAnswer(playerAnswer.getId());
         return new SuccessDataResult<>(playerAnswer,Messages.playerAnswerAdded);

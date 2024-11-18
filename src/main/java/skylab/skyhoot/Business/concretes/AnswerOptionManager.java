@@ -43,6 +43,7 @@ public class AnswerOptionManager implements AnswerOptionService {
         AnswerOption answerOption = AnswerOption.builder()
                 .option(createAnswerOptionDto.getOption())
                 .isCorrect(createAnswerOptionDto.getIsCorrect()==1 ? true : false)
+                .playerCount(0)
                 .question(question)
                 .build();
 
@@ -102,5 +103,28 @@ public class AnswerOptionManager implements AnswerOptionService {
             return new ErrorDataResult<>(Messages.answerOptionNotFound);
         }
         return new SuccessDataResult<>(answerOption, Messages.answerOptionFound);
+    }
+
+    @Override
+    public Result updatePlayerCount(int answerOptionId, int playerCount) {
+        var answerOption = answerOptionDao.findById(answerOptionId);
+        if(answerOption == null) {
+            return new ErrorResult(Messages.answerOptionNotFound);
+        }
+        answerOption.setPlayerCount(playerCount);
+        answerOptionDao.save(answerOption);
+        return new SuccessResult(Messages.playerCountUpdated);
+    }
+
+    @Override
+    public Result clearPlayerCounts(List<Integer> questionIds) {
+        for (int questionId : questionIds) {
+            var answerOptions = answerOptionDao.findAllByQuestion_Id(questionId);
+            for (AnswerOption answerOption : answerOptions) {
+                answerOption.setPlayerCount(0);
+                answerOptionDao.save(answerOption);
+            }
+        }
+        return new SuccessResult(Messages.playerCountsCleared);
     }
 }

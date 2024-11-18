@@ -21,7 +21,7 @@ public class AnswerOptionController {
     }
 
     @PostMapping("/addAnswerOption")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN  ', 'ROLE_MODERATOR', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN  ', 'ROLE_MODERATOR')")
     public Result addAnswerOption(@RequestBody CreateAnswerOptionDto createAnswerOptionDto){
         return answerOptionService.addAnswerOption(createAnswerOptionDto);
     }
@@ -42,7 +42,8 @@ public class AnswerOptionController {
     }
 
     @GetMapping("/getAnswerOptionsByQuestionId")
-    public DataResult<List<GetAnswerOptionDto>> getAnswerOptionsByQuestionId(@RequestBody int questionId){
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    public DataResult<List<GetAnswerOptionDto>> getAnswerOptionsByQuestionId(@RequestParam int questionId){
         return answerOptionService.getAnswerOptionsByQuestionId(questionId);
     }
 

@@ -1,14 +1,12 @@
 package skylab.skyhoot.Business.concretes;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import skylab.skyhoot.Business.abstracts.GameService;
-import skylab.skyhoot.Business.abstracts.PlayerService;
-import skylab.skyhoot.Business.abstracts.QuestionService;
-import skylab.skyhoot.Business.abstracts.UserService;
+import skylab.skyhoot.Business.abstracts.*;
 import skylab.skyhoot.Business.constants.Messages;
 import skylab.skyhoot.core.result.*;
 import skylab.skyhoot.dataAccess.GameDao;
@@ -30,14 +28,16 @@ public class GameManager implements GameService {
     private PlayerService playerService;
     private UserService userService;
     private SimpMessagingTemplate messagingTemplate;
+    private AnswerOptionService answerOptionService;
 
 
-    public GameManager(GameDao gameDao, QuestionService questionService, PlayerService playerService, UserService userService, SimpMessagingTemplate messagingTemplate) {
+    public GameManager(GameDao gameDao, QuestionService questionService, PlayerService playerService, UserService userService, SimpMessagingTemplate messagingTemplate, @Lazy AnswerOptionService answerOptionService) {
         this.gameDao = gameDao;
         this.questionService = questionService;
         this.playerService = playerService;
-        this.messagingTemplate = messagingTemplate;
         this.userService = userService;
+        this.messagingTemplate = messagingTemplate;
+        this.answerOptionService = answerOptionService;
     }
 
     @Override
@@ -358,6 +358,7 @@ public class GameManager implements GameService {
         game.setGameCode("");
         game.setEndedAt(new Date());
     }
+        answerOptionService.clearPlayerCounts(game.getQuestions().stream().map(Question::getId).collect(Collectors.toList()));
         gameDao.save(game);
         return new SuccessResult(Messages.gameEnded);
     }

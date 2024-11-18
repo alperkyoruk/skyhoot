@@ -29,7 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Allow only specific origins to connect to this endpoint
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000") // Update to match your frontend URL
+                .setAllowedOrigins("http://localhost:3000", "https://skyhoot.vercel.app") // Update to match your frontend URL
                 .withSockJS();
     }
 }

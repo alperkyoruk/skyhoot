@@ -159,15 +159,17 @@ public class GameController {
             var getGameId = gameService.getGameId(createPlayerDto.getGameCode());
             message.setGameId(getGameId.getData().getGameId());
             message.setPlayerId(result.getData().getPlayerId());
+            message.setTimestamp(System.currentTimeMillis());
+            message.setSender("System");
             if(!getGameId.isSuccess()){
                 message.setContent("Failed to join game: " + getGameId.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message); // Return failure response with 400
             }
 
 
-            System.out.println("Broadcasting WebSocket message: " + message.getContent());
+            System.out.println("Broadcasting WebSocket message: to " + getGameId.getData().getGameId() + " " + message);
             // Broadcast the new player join event to WebSocket subscribers
-            simpMessagingTemplate.convertAndSend("/topic/game/" + getGameId, message);
+            simpMessagingTemplate.convertAndSend("/topic/game/" + getGameId.getData().getGameId(), message);
 
             return ResponseEntity.ok(message); // Return success response
         } else {
