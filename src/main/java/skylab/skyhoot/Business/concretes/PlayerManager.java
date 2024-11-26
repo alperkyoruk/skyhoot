@@ -1,12 +1,14 @@
 package skylab.skyhoot.Business.concretes;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import skylab.skyhoot.Business.abstracts.GameService;
 import skylab.skyhoot.Business.abstracts.PlayerService;
 import skylab.skyhoot.Business.constants.Messages;
 import skylab.skyhoot.core.result.*;
 import skylab.skyhoot.dataAccess.PlayerDao;
+import skylab.skyhoot.entities.DTOs.Game.GameMessage;
 import skylab.skyhoot.entities.DTOs.Player.CreatePlayerDto;
 import skylab.skyhoot.entities.DTOs.Player.GetPlayerDto;
 import skylab.skyhoot.entities.DTOs.Player.GetPlayerIdGameIdDto;
@@ -21,10 +23,12 @@ public class PlayerManager implements PlayerService {
 
     private PlayerDao playerDao;
     private GameService gameService;
+    private SimpMessagingTemplate messagingTemplate;
 
-    public PlayerManager(PlayerDao playerDao, @Lazy GameService gameService) {
+    public PlayerManager(PlayerDao playerDao, @Lazy GameService gameService, SimpMessagingTemplate messagingTemplate) {
         this.playerDao = playerDao;
         this.gameService = gameService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -54,7 +58,17 @@ public class PlayerManager implements PlayerService {
         if(player == null){
             return new ErrorResult(Messages.playerNotFound);
         }
+        GameMessage gameMessage = new GameMessage();
+        gameMessage.setGameId(player.getGame().getGameId());
+        gameMessage.setPlayerId(player.getPlayerId());
+        gameMessage.setTimestamp(0);
+        gameMessage.setSender("server");
+        gameMessage.setContent("Player " + player.getPlayerName() + " got kicked from the game.");
+
+        messagingTemplate.convertAndSend("/topic/game/" + player.getGame().getGameId() , gameMessage);
         playerDao.delete(player);
+
+
         return new SuccessResult(Messages.playerDeleted);
     }
 
@@ -116,5 +130,36 @@ public class PlayerManager implements PlayerService {
             return new ErrorDataResult<>(Messages.playerNotFound);
         }
         return new SuccessDataResult<>(player, Messages.playerFound);
+    }
+
+    @Override
+    public DataResult<List<GetPlayerDto>> getPlayersByGameIdAndPlayerName(String gameId, String playerName) {
+        var players = playerDao.findAllByGame_GameIdAndPlayerName(gameId, playerName);
+        if(players == null){
+            return new ErrorDataResult<>(Messages.playerNotFound);
+        }
+
+        var returnPlayers = new GetPlayerDto().buildListGetPlayerDto(players);
+        return new SuccessDataResult<>(returnPlayers, Messages.playerFound);
+    }
+
+    @Override
+    public Result kickPlayerByPlayerName(String gameId, String playerName) {
+        var players = playerDao.findAllByGame_GameIdAndPlayerName(gameId, playerName);
+        if(players == null){
+            return new ErrorResult(Messages.playerNotFound);
+        }
+        for (Player player : players) {
+            GameMessage gameMessage = new GameMessage();
+            gameMessage.setGameId(player.getGame().getGameId());
+            gameMessage.setPlayerId(player.getPlayerId());
+            gameMessage.setTimestamp(0);
+            gameMessage.setSender("server");
+            gameMessage.setContent("Player " + player.getPlayerName() + " got kicked from the game.");
+
+            messagingTemplate.convertAndSend("/topic/game/" + player.getGame().getGameId() , gameMessage);
+            playerDao.delete(player);
+        }
+        return new SuccessResult(Messages.playerDeleted);
     }
 }

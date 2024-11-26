@@ -15,4 +15,6 @@ public interface PlayerDao extends JpaRepository<Player, Integer> {
 
     List<Player> findAllByIpAddress(String ipAddress);
 
+    List<Player> findAllByGame_GameIdAndPlayerName(String gameId, String playerName);
+
 }

@@ -67,6 +67,11 @@ public class PlayerController {
         return playerService.getPlayerEntityById(playerId);
     }
 
+    @PostMapping("/kickPlayerByPlayerName")
+    public Result kickPlayerByPlayerName(@RequestParam String gameId, @RequestParam String playerName){
+        return playerService.kickPlayerByPlayerName(gameId, playerName);
+    }
+
 
 
 

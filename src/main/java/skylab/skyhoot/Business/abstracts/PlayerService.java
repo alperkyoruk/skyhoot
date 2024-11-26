@@ -27,4 +27,7 @@ public interface PlayerService {
 
     DataResult<Player> getPlayerEntityByPlayerId(String playerId);
 
+    DataResult<List<GetPlayerDto>> getPlayersByGameIdAndPlayerName(String gameId, String playerName);
+
+    Result kickPlayerByPlayerName(String gameId, String playerName);
 }
