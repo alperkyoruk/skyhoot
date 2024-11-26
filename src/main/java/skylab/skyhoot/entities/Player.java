@@ -25,7 +25,7 @@ public class Player {
     @Column(name = "player_id")
     private String playerId;
 
-    @ManyToOne(targetEntity = Game.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Game.class, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "game_id")
     private Game game;
